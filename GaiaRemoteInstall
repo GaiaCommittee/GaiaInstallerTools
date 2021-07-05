@@ -38,6 +38,12 @@ do
     esac
 done
 
+if [ -z ${path} ]
+then
+    echo "Package path is missing, use '-f {path}' to set the path of the package to install."
+    exit 1
+fi
+
 file=${path##*/}
 
 echo "Installing package ${file} to ${host}:${port}..."
@@ -57,7 +63,7 @@ echo "Uploading done."
 echo "Executing install script on remote host..."
 
 ssh -o StrictHostKeyChecking=no ${user}@${host} -p ${port} << end_of_ssh
-	cd ./home/${user}
+	cd /home/${user}
 	GaiaInstall ${file}
 	rm -rf ${file}
 	exit
