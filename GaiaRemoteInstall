@@ -38,7 +38,7 @@ do
     esac
 done
 
-if [ -z ${path} ]
+if [ -z "${path}" ]
 then
     echo "Package path is missing, use '-f {path}' to set the path of the package to install."
     exit 1
