@@ -7,8 +7,6 @@ function print_help()
     echo "  -u {user}           User name to login via ssh."
     echo "  -h {host}           IP of the remote host via ssh."
     echo "  -p {port}           Port of the remote host via ssh, is 22 by defualt."
-    echo "  -w {password}       Password for logining to the remote host."
-    echo "  -c                  Build and install the CMakeLists.txt inside the package."
 }
 
 if [ $# -eq 0 ]
@@ -21,10 +19,8 @@ path=""
 user=""
 host=""
 port=22
-password=""
-contains_cmake=0
 
-while getopts ":f:u:h:p:w:c" option
+while getopts ":f:u:h:p:" option
 do
     case ${option} in
         f)
@@ -35,10 +31,6 @@ do
             host=${OPTARG};;
         p)
             port=${OPTARG};;
-        c)
-            contains_cmake=1;;
-        w)
-            password=${OPTARG};;
         *)
             echo "Unknown argument(s) encountered."
             print_help
@@ -61,7 +53,6 @@ fi
 echo "Uploading done."
 
 # Execute install script on the remote host.
-
 
 echo "Executing install script on remote host..."
 
