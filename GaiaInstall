@@ -27,8 +27,6 @@ fi
 temporary_folder=./gaia_install_temp_$$
 mkdir ${temporary_folder}
 
-# Whether target folder is extracted from a zip file or not.
-target_extracted=0
 # Folder contains content to install.
 target_folder=${path}
 
@@ -40,7 +38,6 @@ then
     echo "Extracting zip file..."
     unzip -d ./gaia_install_temp_$$/source ${path}
     echo "Extracting done."
-    target_extracted=1
     target_folder="./gaia_install_temp_$$/source"
 fi
 
@@ -66,6 +63,8 @@ else
     # Execute install_script.sh if it exists.
     if [ -x ${target_folder}/install_script.sh ]
     then
+        target_folder="./gaia_install_temp_$$/source"
+        cp -r ${path}/* {target_folder}/
         ${target_folder}/install_script.sh
         rm -f ${target_folder}/install_script.sh
     fi
