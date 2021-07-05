@@ -1,0 +1,79 @@
+#!/bin/bash
+
+function print_help()
+{
+    echo "Gaia Pakcage Install Script:"
+    echo "  {path}           Path of the .zip file or directory to install."
+}
+
+if [ $# -eq 0 ]
+then
+    echo "Missing package path."
+    print_help
+    exit 1
+fi
+
+path=$1
+file=${path##*/}
+
+# Check extension.
+if [ -f ${path} -a "${file##*.}" != "zip" ]
+then
+    echo "File format ${file##*.} is not supported, only directory and zip file are supported."
+    exit 1
+fi
+
+# Prepare temporary folder.
+temporary_folder=./gaia_install_temp_$$
+mkdir ${temporary_folder}
+
+# Whether target folder is extracted from a zip file or not.
+target_extracted=0
+# Folder contains content to install.
+target_folder=${path}
+
+echo "Installing ${file}..."
+
+# Unzip if it is a zip file.
+if [ -f ${path} ]
+then
+    echo "Extracting zip file..."
+    unzip -d ./gaia_install_temp_$$/source ${path}
+    echo "Extracting done."
+    target_extracted=1
+    target_folder="./gaia_install_temp_$$/source"
+fi
+
+# Check whether contains CMakeLists or not.
+if [ -f "${target_folder}/CMakeLists.txt" ]
+then
+    # Execute preinstall_script.sh if it exists.
+    if [ -x ${target_folder}/preinstall_script.sh ]
+    then
+        ${target_folder}/preinstall_script.sh
+        rm -f ${target_folder}/preinstall_script.sh
+    fi
+    echo "CMakeLists.txt detected, executing it..."
+    mkdir ${temporary_folder}/build && cd ${temporary_folder}/build && cmake ../../${target_folder} && make -j install && cd ../../
+    echo "CMakeLists.txt executed."
+    # Execute postinstall_script.sh if it exists.
+    if [ -x ${target_folder}/postinstall_script.sh ]
+    then
+        ${target_folder}/postinstall_script.sh
+        rm -f ${target_folder}/postinstall_script.sh
+    fi
+else
+    # Execute install_script.sh if it exists.
+    if [ -x ${target_folder}/install_script.sh ]
+    then
+        ${target_folder}/install_script.sh
+        rm -f ${target_folder}/install_script.sh
+    fi
+    cp -r ${target_folder}/* /usr/local/
+fi
+
+# Remove temporary folder.
+rm -rf ${temporary_folder}
+
+echo "Installation done."
+
