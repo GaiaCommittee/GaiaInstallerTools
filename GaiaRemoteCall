@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function print_help()
+{
+    echo "Gaia Package Remote Call Script:"
+    echo "  -u {user}           User name to login via ssh."
+    echo "  -h {host}           IP of the remote host via ssh."
+    echo "  -p {port}           Port of the remote host via ssh, is 22 by defualt."
+}
+
+if [ $# -eq 0 ]
+then
+    print_help
+    exit 1
+fi
+
+command=""
+user=""
+host=""
+port=22
+
+while getopts ":c:u:h:p:" option
+do
+    case ${option} in
+        c)
+            command=${OPTARG};;
+        u)
+            user=${OPTARG};;
+        h)
+            host=${OPTARG};;
+        p)
+            port=${OPTARG};;
+    esac
+done
+
+ssh ${user}@${host} -p ${port} ${command}
